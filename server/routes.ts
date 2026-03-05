@@ -261,5 +261,65 @@ export async function registerRoutes(httpServer: Server, app: Express) {
 
   })
 
+  // =========================
+  // CREATE PROJECT
+  // =========================
+  app.post("/api/projects", isAuthenticated, async (req: any, res: any) => {
+
+    try {
+
+      const userId = req.user.id;
+      const { title, description } = req.body;
+
+      const result = await pool.query(
+        `INSERT INTO projects (title, description, owner_id)
+        VALUES ($1,$2,$3)
+        RETURNING *`,
+        [title, description, userId]
+      );
+
+      res.json(result.rows[0]);
+
+    } catch (error) {
+
+      console.error(error);
+      res.status(500).json({ message: "Failed to create project" });
+
+    }
+
+  });
+
+  // =========================
+  // GET ALL PROJECTS
+  // =========================
+  app.get("/api/projects", async (req, res) => {
+
+    try {
+
+      const result = await pool.query(
+        `SELECT * FROM projects ORDER BY created_at DESC`
+      );
+
+      res.json(result.rows);
+
+    } catch (error) {
+
+      console.error(error);
+      res.status(500).json({ message: "Failed to fetch projects" });
+
+    }
+
+  });
+
+  //SINGLE PROJECT DETAILS
+  app.get("/api/projects/:id", async (req, res) => {
+    const result = await pool.query(
+      `SELECT * FROM projects WHERE id=$1`,
+      [req.params.id]
+    );
+
+    res.json(result.rows[0]);
+  });
+
   return httpServer
 }

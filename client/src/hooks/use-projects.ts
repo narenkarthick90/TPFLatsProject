@@ -1,50 +1,86 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { api, buildUrl } from "@shared/routes";
-import type { InsertProject } from "@shared/schema";
+
+export interface Project {
+  id: number;
+  title: string;
+  description: string;
+  owner_id: string;
+  created_at: string;
+
+  techStack: string[];
+  skillsRequired: string[];
+  collaboratorsNeeded: number;
+  projectType: string;
+  duration: string;
+  contactInfo: string;
+}
+
+/* ---------------- GET ALL PROJECTS ---------------- */
 
 export function useProjects() {
-  return useQuery({
-    queryKey: [api.projects.list.path],
+  return useQuery<Project[]>({
+    queryKey: ["/api/projects"],
     queryFn: async () => {
-      const res = await fetch(api.projects.list.path, { credentials: "include" });
-      if (!res.ok) throw new Error("Failed to fetch projects");
-      return api.projects.list.responses[200].parse(await res.json());
+      const res = await fetch("/api/projects", {
+        credentials: "include",
+      });
+
+      if (!res.ok) {
+        throw new Error("Failed to fetch projects");
+      }
+
+      return res.json();
     },
   });
 }
 
+/* ---------------- GET SINGLE PROJECT ---------------- */
+
 export function useProject(id: number) {
-  return useQuery({
-    queryKey: [api.projects.get.path, id],
+  return useQuery<Project>({
+    queryKey: ["/api/projects", id],
     queryFn: async () => {
-      const url = buildUrl(api.projects.get.path, { id });
-      const res = await fetch(url, { credentials: "include" });
-      if (res.status === 404) return null;
-      if (!res.ok) throw new Error("Failed to fetch project");
-      return api.projects.get.responses[200].parse(await res.json());
+      const res = await fetch(`/api/projects/${id}`, {
+        credentials: "include",
+      });
+
+      if (!res.ok) {
+        throw new Error("Failed to fetch project");
+      }
+
+      return res.json();
     },
     enabled: !!id,
   });
 }
 
+/* ---------------- CREATE PROJECT ---------------- */
+
 export function useCreateProject() {
   const queryClient = useQueryClient();
+
   return useMutation({
-    mutationFn: async (data: Omit<InsertProject, "creatorId">) => {
-      const res = await fetch(api.projects.create.path, {
-        method: api.projects.create.method,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
+    mutationFn: async (data: any) => {
+      const res = await fetch("/api/projects", {
+        method: "POST",
         credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
       });
+
       if (!res.ok) {
-        const err = await res.json();
-        throw new Error(err.message || "Failed to create project");
+        throw new Error("Failed to create project");
       }
-      return api.projects.create.responses[201].parse(await res.json());
+
+      return res.json();
     },
+
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [api.projects.list.path] });
+      queryClient.invalidateQueries({
+        queryKey: ["/api/projects"],
+      });
     },
   });
 }
