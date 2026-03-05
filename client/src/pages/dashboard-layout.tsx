@@ -20,7 +20,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   }
 
   if (!isAuthenticated) {
-    window.location.href = "/api/login";
+    window.location.href = "/auth";
     return null;
   }
 

@@ -14,14 +14,17 @@ export default function AuthPage() {
       headers: {
         "Content-Type": "application/json",
       },
+      credentials: "include", // ✅ important for session
       body: JSON.stringify({ email }),
     });
 
+    const data = await res.json();
+
     if (res.ok) {
       setOtpSent(true);
-      alert("OTP sent to email");
+      alert(data.message || "OTP sent to email");
     } else {
-      alert("Invalid email");
+      alert(data.message || "Invalid email");
     }
   }
 
@@ -31,20 +34,22 @@ export default function AuthPage() {
       headers: {
         "Content-Type": "application/json",
       },
+      credentials: "include", // ✅ important
       body: JSON.stringify({ email, otp }),
-      credentials: "include",
     });
 
+    const data = await res.json();
+
     if (res.ok) {
+      // ✅ redirect after successful login
       setLocation("/projects");
     } else {
-      alert("Invalid OTP");
+      alert(data.message || "Invalid OTP");
     }
   }
 
   return (
     <div className="min-h-screen flex items-center justify-center">
-
       <div className="p-8 border rounded-lg w-96 space-y-4">
 
         {!otpSent && (
@@ -88,7 +93,6 @@ export default function AuthPage() {
         )}
 
       </div>
-
     </div>
   );
 }
