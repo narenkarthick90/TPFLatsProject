@@ -1,8 +1,11 @@
 import { Express } from "express";
 import { Server } from "http";
 import nodemailer from "nodemailer";
+import { pool } from "./db";  
 
 const otpStore: Record<string, string> = {};
+
+
 
 // EMAIL TRANSPORTER
 const transporter = nodemailer.createTransport({
@@ -14,6 +17,13 @@ const transporter = nodemailer.createTransport({
 });
 
 export async function registerRoutes(httpServer: Server, app: Express) {
+
+  app.get("/api/test-db", async (req,res)=>{
+
+    const result = await pool.query("SELECT NOW()");
+    res.json(result.rows);
+
+  });
 
   // middleware to check login
   function isAuthenticated(req: any, res: any, next: any) {
@@ -68,7 +78,7 @@ export async function registerRoutes(httpServer: Server, app: Express) {
   // =========================
   // VERIFY OTP
   // =========================
-  app.post("/api/verify-otp", (req: any, res) => {
+  app.post("/api/verify-otp", async (req: any, res) => {
 
     const { email, otp } = req.body
 
@@ -80,15 +90,30 @@ export async function registerRoutes(httpServer: Server, app: Express) {
 
     const rollno = email.split("@")[0]
 
-    req.session.user = {
-      id: rollno,
-      email
-    }
+    try {
 
-    res.json({
-      message: "login success",
-      user: req.session.user
-    })
+      // SAVE USER IN DATABASE
+      await pool.query(
+        "INSERT INTO users (id,email) VALUES ($1,$2) ON CONFLICT (id) DO NOTHING",
+        [rollno, email]
+      )
+
+      req.session.user = {
+        id: rollno,
+        email
+      }
+
+      res.json({
+        message: "login success",
+        user: req.session.user
+      })
+
+    } catch (err) {
+
+      console.error(err)
+      res.status(500).json({ message: "Database error" })
+
+    }
 
   })
 
