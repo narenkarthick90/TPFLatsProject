@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/not-found";
 import Landing from "@/pages/landing";
+import AuthPage from "@/pages/AuthPage";   // ✅ ADDED
 import DashboardLayout from "@/pages/dashboard-layout";
 import Projects from "@/pages/projects";
 import ProjectDetails from "@/pages/project-details";
@@ -15,6 +16,10 @@ function Router() {
   return (
     <Switch>
       <Route path="/" component={Landing} />
+
+      {/* ✅ AUTH ROUTE ADDED */}
+      <Route path="/auth" component={AuthPage} />
+
       <Route path="/projects">
         {() => (
           <DashboardLayout>
@@ -22,6 +27,7 @@ function Router() {
           </DashboardLayout>
         )}
       </Route>
+
       <Route path="/projects/:id">
         {() => (
           <DashboardLayout>
@@ -29,6 +35,7 @@ function Router() {
           </DashboardLayout>
         )}
       </Route>
+
       <Route path="/profile">
         {() => (
           <DashboardLayout>
@@ -36,6 +43,7 @@ function Router() {
           </DashboardLayout>
         )}
       </Route>
+
       <Route path="/applications">
         {() => (
           <DashboardLayout>
@@ -43,6 +51,7 @@ function Router() {
           </DashboardLayout>
         )}
       </Route>
+
       <Route component={NotFound} />
     </Switch>
   );

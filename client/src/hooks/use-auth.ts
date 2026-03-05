@@ -2,7 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import type { User } from "@shared/models/auth";
 
 async function fetchUser(): Promise<User | null> {
-  const response = await fetch("/api/auth/user", {
+  const response = await fetch("/api/me", {
     credentials: "include",
   });
 
@@ -18,22 +18,26 @@ async function fetchUser(): Promise<User | null> {
 }
 
 async function logout(): Promise<void> {
-  window.location.href = "/api/logout";
+  await fetch("/api/logout", {
+    method: "POST",
+    credentials: "include",
+  });
 }
 
 export function useAuth() {
   const queryClient = useQueryClient();
+
   const { data: user, isLoading } = useQuery<User | null>({
-    queryKey: ["/api/auth/user"],
+    queryKey: ["/api/me"],
     queryFn: fetchUser,
     retry: false,
-    staleTime: 1000 * 60 * 5, // 5 minutes
+    staleTime: 1000 * 60 * 5,
   });
 
   const logoutMutation = useMutation({
     mutationFn: logout,
     onSuccess: () => {
-      queryClient.setQueryData(["/api/auth/user"], null);
+      queryClient.setQueryData(["/api/me"], null);
     },
   });
 

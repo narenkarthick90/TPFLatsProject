@@ -10,15 +10,14 @@ export default function Landing() {
   const [, setLocation] = useLocation();
 
   useEffect(() => {
-    // Force dark mode
-    document.documentElement.classList.add('dark');
+    document.documentElement.classList.add("dark");
   }, []);
 
-  const handleEnter = () => {
+  const handleEnter = async () => {
     if (isAuthenticated) {
       setLocation("/projects");
     } else {
-      window.location.href = "/api/login";
+      setLocation("/auth");
     }
   };
 
@@ -32,22 +31,20 @@ export default function Landing() {
 
   return (
     <div className="relative min-h-screen bg-background overflow-hidden flex flex-col items-center justify-center">
-      {/* Background Shader */}
       <WebGLShader className="absolute inset-0 z-0 pointer-events-none opacity-60" />
-      
-      {/* Content */}
+
       <div className="relative z-10 text-center px-4 max-w-5xl mx-auto flex flex-col items-center animate-in fade-in slide-in-from-bottom-8 duration-1000">
         <div className="inline-block border border-primary/50 bg-background/50 backdrop-blur-sm px-4 py-1.5 text-primary font-mono text-sm tracking-widest mb-8 brutal-shadow">
           SYS.INIT // NITT HUB_
         </div>
-        
+
         <h1 className="font-display text-5xl md:text-7xl lg:text-8xl font-bold text-foreground tracking-tighter mb-6 drop-shadow-[0_0_15px_rgba(0,255,255,0.5)]">
           BUILD THE <span className="text-primary">FUTURE</span>
         </h1>
-        
+
         <p className="font-mono text-lg md:text-xl text-muted-foreground max-w-2xl mb-12">
-          Connect with top builders at NITT. Post projects, find teams, and execute high-impact ideas. 
-          The grid is waiting.
+          Connect with top builders at NITT. Post projects, find teams, and
+          execute high-impact ideas. The grid is waiting.
         </p>
 
         <LiquidGlassButton onClick={handleEnter}>
@@ -55,7 +52,6 @@ export default function Landing() {
         </LiquidGlassButton>
       </div>
 
-      {/* Decorative corners */}
       <div className="absolute top-8 left-8 border-t-2 border-l-2 border-primary/50 w-16 h-16 pointer-events-none" />
       <div className="absolute bottom-8 right-8 border-b-2 border-r-2 border-primary/50 w-16 h-16 pointer-events-none" />
     </div>
