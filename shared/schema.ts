@@ -37,7 +37,7 @@ export const projects = pgTable("projects", {
   techStack: text("tech_stack").array().notNull(),
   skillsRequired: text("skills_required").array().notNull(),
   collaboratorsNeeded: integer("collaborators_needed").notNull(),
-  projectType: text("project_type").notNull(), 
+  projectType: text("project_type").notNull(),
   duration: text("duration").notNull(),
   contactInfo: text("contact_info").notNull(),
   creatorId: varchar("creator_id").references(() => users.id).notNull(),
@@ -51,7 +51,7 @@ export const applications = pgTable("applications", {
   applicantId: varchar("applicant_id").references(() => users.id).notNull(),
   resumeUrl: text("resume_url"),
   message: text("message"),
-  status: text("status").notNull().default("pending"), 
+  status: text("status").notNull().default("pending"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -80,12 +80,29 @@ export const applicationsRelations = relations(applications, ({ one }) => ({
   }),
 }));
 
-export const insertProjectSchema = createInsertSchema(projects).omit({ id: true, createdAt: true, updatedAt: true });
-export const insertApplicationSchema = createInsertSchema(applications).omit({ id: true, status: true, createdAt: true, updatedAt: true });
-export const updateUserSchema = createInsertSchema(users).omit({ id: true, createdAt: true, updatedAt: true, email: true });
+export const insertProjectSchema = createInsertSchema(projects).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertApplicationSchema = createInsertSchema(applications).omit({
+  id: true,
+  status: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const updateUserSchema = createInsertSchema(users).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+  email: true,
+});
 
 export type User = typeof users.$inferSelect;
 export type UpsertUser = typeof users.$inferInsert;
+
 export type Project = typeof projects.$inferSelect;
 export type Application = typeof applications.$inferSelect;
 
@@ -93,6 +110,14 @@ export type InsertProject = z.infer<typeof insertProjectSchema>;
 export type InsertApplication = z.infer<typeof insertApplicationSchema>;
 export type UpdateUser = z.infer<typeof updateUserSchema>;
 
-export type ProjectWithCreator = Project & { creator: User };
-export type ApplicationWithApplicant = Application & { applicant: User };
-export type ApplicationWithProject = Application & { project: Project };
+export type ProjectWithCreator = Project & {
+  creator?: User;
+};
+
+export type ApplicationWithApplicant = Application & {
+  applicant?: User;
+};
+
+export type ApplicationWithProject = Application & {
+  project?: Project;
+};
