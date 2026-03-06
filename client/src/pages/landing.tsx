@@ -6,7 +6,7 @@ import { useEffect } from "react";
 import { Terminal } from "lucide-react";
 
 export default function Landing() {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading } = useAuth(); //calling function and when it returns values, i.e isAuthenticated and isLoading stored here, correspondingly
   const [, setLocation] = useLocation();
 
   useEffect(() => {
